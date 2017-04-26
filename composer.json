@@ -1,5 +1,5 @@
 {
-    "name": "anthonybudd/wp_model",
+    "name": "anthonybudd/wp_mail",
     "type": "library",
     "authors": [
         {
@@ -8,6 +8,6 @@
         }
     ],
     "autoload": {
-        "files": ["src/WP_Model.php"]
+        "files": ["src/WP_Mail.php"]
     }  
 }
