@@ -11,15 +11,15 @@
 $email = (new WP_Mail)
     ->to('anthonybudd94@gmail.com')
     ->subject('test')
-    ->setTemplatePath('emails/email.html', [
+    ->setTemplatePath('email.html', [
         'name' => 'Anthony Budd',
         'job' => 'Developer',
     ])
     ->send();
 ```
 
+email.html
 ```html
-<!-- emails/email.html -->
 <h1>Hello {{name}},</h1>
 <p>You work as a {{job}}.</p>
 ```
