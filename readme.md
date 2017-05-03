@@ -4,7 +4,7 @@
 
 ## A simple class for sending templated emails using WordPress
 
-###Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-model-6887e1a24d3c)
+### Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-model-6887e1a24d3c)
 
 
 ```php
