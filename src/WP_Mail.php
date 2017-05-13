@@ -15,39 +15,47 @@ Class WP_Mail
 	private $cc = [];
 	private $bcc = [];
 	private $subject = '';
+	private $from = '';
 	private $headers = [];
 	private $attachments = [];
 
 	private $variables = [];
 	private $template = FALSE;
-
 	private $sendAsHTML = TRUE;
 
 
-	public function __construct(){
+	public function __construct(){}
 
-	}
 
-	public static function HTMLFilter(){
-		return 'text/html';
-	}
-
-	public function sendAsHTML($html){
-		if(is_bool($html)){
-			$this->sendAsHTML = $html;
+	/**
+	 * Set recipients
+	 * @param  Array|String $to
+	 * @return Object $this
+	 */
+	public function to($to){
+		if(is_array($to)){
+			$this->to = $to;
+		}else{
+			$this->to = [$to];
 		}
 		return $this;
 	}
 
-	public function to($to){
-		$this->to = $to;
-		return $this;
-	}
 
+	/**
+	 * Get recipients
+	 * @return Array $to
+	 */
 	public function getTo(){
 		return $this->to;
 	}
 
+
+	/**
+	 * Set Cc recipients
+	 * @param  String|Array $cc
+	 * @return Object $this
+	 */
 	public function cc($cc){
 		if(is_array($cc)){
 			$this->cc = $cc;
@@ -57,10 +65,21 @@ Class WP_Mail
 		return $this;
 	}
 
+
+	/**
+	 * Get Cc recipients
+	 * @return Array $cc
+	 */
 	public function getCc(){
 		return $this->cc;
 	}
 
+
+	/**
+	 * Set Email Bcc recipients
+	 * @param  String|Array $bcc
+	 * @return Object $this
+	 */
 	public function bcc($bcc){
 		if(is_array($bcc)){
 			$this->bcc = $bcc;
@@ -71,75 +90,155 @@ Class WP_Mail
 		return $this;
 	}
 
+
+	/**
+	 * Set email Bcc recipients
+	 * @return Array $bcc
+	 */
 	public function getBcc(){
 		return $this->bcc;
 	}
 
+
+	/**	
+	 * Set email Subject
+	 * @param  Srting $subject
+	 * @return Object $this
+	 */
 	public function subject($subject){
 		$this->subject = $subject;
 		return $this;
 	}
 
+
+	/**
+	 * Retruns email subject
+	 * @return Array
+	 */
 	public function getSubject(){
 		return $this->subject;
 	}
 
-	public function headers(Array $headers){
-		$this->headers = $headers;
+
+	/**
+	 * Set From header
+	 * @param  String
+	 * @return Object $this
+	 */
+	public function from($from){
+		$this->from = $from;
 		return $this;
 	}
 
-	public function addHeader($header){
+
+	/**
+	 * Add a single header to the headers array
+	 * @param Strring
+	 * @return Object $this
+	 */
+	public function header($header){
 		$this->headers[] = $header;
 		return $this;
 	}
 
+
+	/**	
+	 * Adds array of header
+	 * @param  Array  $headers [description]
+	 * @return Object $this
+	 */
+	public function headers(Array $headers){
+		foreach($headers as $header){
+			$this->header($header);
+		}
+		return $this;
+	}
+
+
+	/**
+	 * Retruns headers
+	 * @return Array
+	 */
 	public function getHeaders(){
 		return $this->headers;
 	}
 
-	public function attachFile($path){
-		if(!file_exists($path)){
-			throw new Exception('Attachment not found');
-		}
 
-		$this->attachments[] = $path;
+	/**
+	 * Returns email content type
+	 * @return String
+	 */
+	public static function HTMLFilter(){
+		return 'text/html';
+	}
+
+
+	/**	
+	 * Set email content type
+	 * @param  Bool $html
+	 * @return Object $this
+	 */
+	public function sendAsHTML($html){
+		$this->sendAsHTML = $html;
 		return $this;
 	}
 
-	public function setTemplate($template, $variables = NULL){
-		if(is_array($variables)){
-			$this->setVariables($variables);
+
+	/**	
+	 * Attach a file or array of files.
+	 * Filepaths must be absolute.
+	 * @param  String|Array $path 
+	 * @throws Exception
+	 * @return Object $this
+	 */
+	public function attach($path){
+		if(is_array($path)){
+			$this->attachments = [];
+			foreach($path as $path_) {
+				if(!file_exists($path_)){
+					throw new Exception("Attachment not found at $path");
+				}else{
+					$this->attachments[] = $path_;
+				}
+			}
+		}else{
+			if(!file_exists($path)){
+				throw new Exception("Attachment not found at $path");
+			}
+			$this->attachments = [$path];
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * Set the template file
+	 * @param  string $template  Path to HTML template
+	 * @param  array  $variables
+	 * @throws Exception
+	 * @return Object $this
+	 */
+	public function template($template, $variables = []){
+		if(!file_exists($template)){
+			throw new Exception('File not found');
+		}
+
+		if(is_array($variables)){ 
+			$this->variables = $variables;
 		}
 
 		$this->template = $template;
 		return $this;
 	}
 
-	public function setTemplatePath($templatePath, $variables = NULL){
-		if(!file_exists($templatePath)){
-			throw new Exception('File not found');
-		}
 
-		if(is_array($variables)){
-			$this->setVariables($variables);
-		}
-
-		$this->setTemplate(file_get_contents($templatePath));
-		return $this;
-	}
-
-	public function setVariables(Array $variables){
-		if(!is_array($variables)){ 
-			throw new Exception('$variables must be an assoc array');
-		}
-
-		$this->variables = $variables;
-		return $this;
-	}
-
+	/**
+	 * Renders the template
+	 * @return string
+	 */
 	private function render(){
-		$template = $this->template;
+		$template = file_get_contents($this->template);
 
 		preg_match_all('/\{\{\s*.+?\s*\}\}/', $template, $matches);
 		foreach($matches[0] as $match){
@@ -153,8 +252,15 @@ Class WP_Mail
 		return $template;
 	}
 
+
+	/**
+	 * Builds Email Headers
+	 * @return string email headers
+	 */
 	private function buildHeaders(){
-		$headers = implode("\r\n", $this->headers) ."\r\n";
+		$headers = '';
+
+		$headers .= implode("\r\n", $this->headers) ."\r\n";
 
 		foreach($this->bcc as $bcc){
 			$headers .= sprintf("Bcc: %s \r\n", $bcc);
@@ -164,38 +270,42 @@ Class WP_Mail
 			$headers .= sprintf("Cc: %s \r\n", $cc);
 		}
 
+		if(!empty($this->from)){
+			$headers .= sprintf("From: %s \r\n", $this->from);
+		}
+
 		return $headers;
 	}
 
+
+	/**
+	 * Set the wp_mail_content_type filter, if necessary 
+	 */
 	private function beforeSend(){
+		if(count($this->to) === 0){
+			throw new Exception('You must set at least 1 recipient');
+		}
+
+		if(empty($this->template)){
+			throw new Exception('You must set a template');
+		}
+
 		if($this->sendAsHTML){
 			add_filter('wp_mail_content_type', ['WP_Mail', 'HTMLFilter']);
 		}
 	}		
 
+
+	/**
+	 * Sends a rendered email using
+	 * WordPress's wp_mail() function
+	 * @return bool
+	 */
 	public function send(){
 		$this->beforeSend();
+
+		echo $this->render();
+		die();
 		return wp_mail($this->to, $this->subject, $this->render(), $this->buildHeaders(), $this->attachments);
 	}
 }
-
-
-$email = (new WP_Mail)
-	->to('anthonybudd94@gmail.com')
-	->cc([
-		'anthonybudd94@gmail.com',
-		'anthonybudd94@gmail.com',
-	])
-	->bcc('anthonybudd94@gmail.com')
-	->subject('test')
-	->headers([
-		'From: Me Myself <me@example.net>',
-		'Cc: John Q Codex <jqc@wordpress.org>',
-	])
-	->setTemplatePath('/Users/anthonybudd/Development/WP_Email/src/email.html', [
-		'name' => 'Anthony Budd',
-		'age' => '22',
-	])
-	->send();
-
-
