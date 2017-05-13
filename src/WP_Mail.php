@@ -130,26 +130,16 @@ Class WP_Mail
 		return $this;
 	}
 
-
-	/**
-	 * Add a single header to the headers array
-	 * @param Strring
-	 * @return Object $this
-	 */
-	public function header($header){
-		$this->headers[] = $header;
-		return $this;
-	}
-
-
 	/**	
-	 * Adds array of header
-	 * @param  Array  $headers [description]
+	 * Set the email's headers
+	 * @param  String|Array  $headers [description]
 	 * @return Object $this
 	 */
-	public function headers(Array $headers){
-		foreach($headers as $header){
-			$this->header($header);
+	public function headers($headers){
+		if(is_array($headers)){
+			$this->headers = $headers;
+		}else{
+			$this->headers = [$headers];
 		}
 		return $this;
 	}
@@ -303,9 +293,6 @@ Class WP_Mail
 	 */
 	public function send(){
 		$this->beforeSend();
-
-		echo $this->render();
-		die();
 		return wp_mail($this->to, $this->subject, $this->render(), $this->buildHeaders(), $this->attachments);
 	}
 }

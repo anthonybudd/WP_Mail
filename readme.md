@@ -50,20 +50,22 @@ Download the WP_Mail class and require it at the top of your functions.php file.
 
 ***
 
-### Setup
-You will then need to make a class that extends WP_Model. This class will need the public property $postType and $attributes, an array of strings.
+### Methods
 
-If you need to prefix the model's data in your post_meta table add a public property $prefix. This will be added to the post meta so the attribute 'color' will be saved in the database using the meta_key 'wp_model_color'
-```php
-Class Product extends WP_Model
-{
-    public $postType = 'product';
-    
-    public $prefix = 'wp_model_';
+#### to(), cc(), bcc()
+All of these functions allow you to set an array or string of recipient(s) for your email as shown in the example below.
 
-    public $attributes = [
-        'color',
-        'weight'
-    ];
-}
-```
+#### subject()
+To set the subject field use the subject function. The first argument will be the emails subject.
+
+#### attach()
+Similar to the to, cc and bcc, functions the attach method can accept a string or array of stings. This strings must be absolute file paths, this method will throw if the file does not exist.
+
+#### template($templatePath, $variables = [])
+The templet method is for setting the path to the html email template. The second argument is for an asoc array where the keys will correspond to your HTML email’s variables. Variables are optional and are not required for templates that do not have any variables.
+
+#### headers()
+This method allows you to set additional headers for your email. This can be an array of headers or a single string header.
+
+#### send()
+The render() method is called when you send an email will use a simple bit of regex to find and replace variables using a mustache-esque syntax. Finally the method sends the email using WordPresses built in wp_mail() function.
