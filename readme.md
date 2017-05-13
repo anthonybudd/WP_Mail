@@ -1,6 +1,6 @@
 # WP_Mail
 
-<p align="center"><img src="https://c1.staticflickr.com/1/415/31850480513_6cf2b5bdde_b.jpg"></p>
+<p align="center"><img src="https://c1.staticflickr.com/5/4156/34476075652_c809cd37f6_o.png"></p>
 
 ## A simple class for sending templated emails using WordPress
 
