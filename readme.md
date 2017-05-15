@@ -1,10 +1,10 @@
-# WP_Mail
+# WP_Mail - Send
 
 <p align="center"><img src="https://c1.staticflickr.com/5/4156/34476075652_c809cd37f6_o.png"></p>
 
 ## A simple class for sending templated emails using WordPress
 
-### Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-model-6887e1a24d3c)
+### Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
 
 
 ```php
