@@ -26,12 +26,6 @@ email.html
 
 ***
 
-### In A Nutshell
-
-The send() method renders the template and will fire the built in WordPress function wp_mail().
-
-***
-
 ### Installation
 
 Require WP_Mail with composer
