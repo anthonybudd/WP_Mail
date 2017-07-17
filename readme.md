@@ -1,4 +1,4 @@
-# WP_Mail - Send
+# WP_Mail - Send Templated emails with WordPress
 
 <p align="center"><img src="https://c1.staticflickr.com/5/4156/34476075652_c809cd37f6_o.png"></p>
 
