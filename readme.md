@@ -56,6 +56,7 @@ All of these functions allow you to set an array or string of recipient(s) for y
             'johndoe@gmail.com'
             'mikesmith@gmail.com'
         ])
+        ->cc('JackTaylor@gmail.com')
 ```
 
 
