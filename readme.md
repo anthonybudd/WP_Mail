@@ -11,7 +11,7 @@
 $email = (new WP_Mail)
     ->to('anthonybudd94@gmail.com')
     ->subject('test')
-    ->setTemplatePath('email.html', [
+    ->template('email.html', [
         'name' => 'Anthony Budd',
         'job' => 'Developer',
     ])
@@ -49,6 +49,14 @@ Download the WP_Mail class and require it at the top of your functions.php file.
 #### to(), cc(), bcc()
 All of these functions allow you to set an array or string of recipient(s) for your email as shown in the example below.
 
+```php
+	$email = (new WP_Mail)
+    	->to([
+    		'johndoe@gmail.com'
+    		'mikesmith@gmail.com'
+    	])
+```
+
 #### subject()
 To set the subject field use the subject function. The first argument will be the emails subject.
 
@@ -60,6 +68,11 @@ The templet method is for setting the path to the html email template. The secon
 
 #### headers()
 This method allows you to set additional headers for your email. This can be an array of headers or a single string header.
+
+```php
+	$email = (new WP_Mail)
+    	->headers("From: John Doe <john.doe@ideea.co.uk> \r\n")
+```
 
 #### send()
 The render() method is called when you send an email will use a simple bit of regex to find and replace variables using a mustache-esque syntax. Finally the method sends the email using WordPresses built in wp_mail() function.

@@ -141,6 +141,7 @@ Class WP_Mail
 		}else{
 			$this->headers = [$headers];
 		}
+		
 		return $this;
 	}
 
