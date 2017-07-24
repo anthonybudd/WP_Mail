@@ -65,7 +65,15 @@ To set the subject field use the subject function. The first argument will be th
 
 ```php
     $email = (new WP_Mail)
-        ->subject('This tis the subject')
+        ->subject('This this the subject')
+```
+
+#### from()
+To set the from header there is a useful helper function.
+
+```php
+    $email = (new WP_Mail)
+        ->from('John Doe <john.doe@ideea.co.uk>')
 ```
 
 
@@ -95,7 +103,17 @@ This method allows you to set additional headers for your email. This can be an 
 
 ```php
     $email = (new WP_Mail)
-        ->headers("From: John Doe <john.doe@ideea.co.uk> \r\n")
+        ->headers("From: John Doe <john.doe@ideea.co.uk>")
+```
+
+```php
+    $email = (new WP_Mail)
+        ->headers([
+            "From: John Doe <john.doe@ideea.co.uk>",
+            "X-Mailer: PHP/". phpversion(),
+            "Reply-To: webmaster@ideea.co.uk",
+            "Content-type: text/html; charset=iso-8859-1",
+        ])
 ```
 
 
