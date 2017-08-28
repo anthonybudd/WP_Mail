@@ -229,7 +229,9 @@ Class WP_Mail
 	 * @return string
 	 */
 	private function render(){
-		$template = file_get_contents($this->template);
+		ob_start();
+		include $this->template;
+		$template = ob_get_clean();
 
 		preg_match_all('/\{\{\s*.+?\s*\}\}/', $template, $matches);
 		foreach($matches[0] as $match){
