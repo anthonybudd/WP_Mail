@@ -8,23 +8,30 @@
  *
  * @author     AnthonyBudd <anthonybudd94@gmail.com>
  */
-Class WP_Mail
-{
+Class WP_Mail{
 
-	private $to = [];
-	private $cc = [];
-	private $bcc = [];
-	private $subject = '';
-	private $from = '';
-	private $headers = [];
-	private $attachments = [];
+	private $to 			 = array();
+	private $cc 			 = array();
+	private $bcc 			 = array();
+	private $headers 		 = array();
+	private $attachments 	 = array();
+	private $sendAsHTML 	 = TRUE;
+	private $subject 		 = '';
+	private $from 			 = '';
 
-	private $variables = [];
-	private $template = FALSE;
-	private $sendAsHTML = TRUE;
+	private $beforeTemplate  = FALSE;
+	private $beforeVariables = array();
+	private $template 		 = FALSE;
+	private $variables 		 = array();
+	private $afterTemplate   = FALSE;
+	private $afterVariables  = array();
 
 
 	public function __construct(){}
+
+	public static function init(){
+		return new Self;
+	}
 
 
 	/**
@@ -36,7 +43,7 @@ Class WP_Mail
 		if(is_array($to)){
 			$this->to = $to;
 		}else{
-			$this->to = [$to];
+			$this->to = array($to);
 		}
 		return $this;
 	}
@@ -60,7 +67,7 @@ Class WP_Mail
 		if(is_array($cc)){
 			$this->cc = $cc;
 		}else{
-			$this->cc = [$cc];
+			$this->cc = array($cc);
 		}
 		return $this;
 	}
@@ -84,7 +91,7 @@ Class WP_Mail
 		if(is_array($bcc)){
 			$this->bcc = $bcc;
 		}else{
-			$this->bcc = [$bcc];
+			$this->bcc = array($bcc);
 		}
 
 		return $this;
@@ -139,7 +146,7 @@ Class WP_Mail
 		if(is_array($headers)){
 			$this->headers = $headers;
 		}else{
-			$this->headers = [$headers];
+			$this->headers = array($headers);
 		}
 		
 		return $this;
@@ -159,7 +166,7 @@ Class WP_Mail
 	 * Returns email content type
 	 * @return String
 	 */
-	public static function HTMLFilter(){
+	public function HTMLFilter(){
 		return 'text/html';
 	}
 
@@ -184,7 +191,7 @@ Class WP_Mail
 	 */
 	public function attach($path){
 		if(is_array($path)){
-			$this->attachments = [];
+			$this->attachments = array();
 			foreach($path as $path_) {
 				if(!file_exists($path_)){
 					throw new Exception("Attachment not found at $path");
@@ -196,9 +203,30 @@ Class WP_Mail
 			if(!file_exists($path)){
 				throw new Exception("Attachment not found at $path");
 			}
-			$this->attachments = [$path];
+			$this->attachments = array($path);
 		}
 
+		return $this;
+	}
+
+
+	/**
+	 * Set the before-template file
+	 * @param  string $template  Path to HTML template
+	 * @param  array  $variables
+	 * @throws Exception
+	 * @return Object $this
+	 */
+	public function beforeTemplate($template, $variables = NULL){
+		if(!file_exists($template)){
+			throw new Exception('Template file not found');
+		}
+
+		if(is_array($variables)){ 
+			$this->beforeVariables = $variables;
+		}
+
+		$this->beforeTemplate = $template;
 		return $this;
 	}
 
@@ -210,7 +238,7 @@ Class WP_Mail
 	 * @throws Exception
 	 * @return Object $this
 	 */
-	public function template($template, $variables = []){
+	public function template($template, $variables = NULL){
 		if(!file_exists($template)){
 			throw new Exception('File not found');
 		}
@@ -225,18 +253,78 @@ Class WP_Mail
 
 
 	/**
+	 * Set the after-template file
+	 * @param  string $template  Path to HTML template
+	 * @param  array  $variables
+	 * @throws Exception
+	 * @return Object $this
+	 */
+	public function afterTemplate($template, $variables = NULL){
+		if(!file_exists($template)){
+			throw new Exception('Template file not found');
+		}
+
+		if(is_array($variables)){ 
+			$this->afterVariables = $variables;
+		}
+
+		$this->afterTemplate = $template;
+		return $this;
+	}
+
+
+	/**
 	 * Renders the template
 	 * @return string
 	 */
-	private function render(){
-		$template = file_get_contents($this->template);
+	public function render(){
+		return $this->renderPart('before') . 
+			$this->renderPart('main') .
+			$this->renderPart('after');
+	}
+	
+
+	/**
+	 * Render a specific part of the email
+	 * @author Anthony Budd
+	 * @param  string $part before, after, main
+	 * @return string 
+	 */
+	public function renderPart($part = 'main'){
+		switch($part){
+			case 'before':
+				$templateFile = $this->beforeTemplate;
+				$variables    = $this->beforeVariables;
+				break;
+
+			case 'after':
+				$templateFile = $this->afterTemplate;
+				$variables    = $this->afterVariables;
+				break;
+			
+			case 'main':
+			default:
+				$templateFile = $this->template;
+				$variables    = $this->variables;
+				break;
+		}
+
+		if($templateFile === FALSE){
+			return '';
+		}
+
+		$template = file_get_contents($templateFile);
+
+		if(!is_array($variables) || empty($variables)){
+			return $template;
+		}
 
 		preg_match_all('/\{\{\s*.+?\s*\}\}/', $template, $matches);
 		foreach($matches[0] as $match){
 			$var = str_replace('{', '', str_replace('}', '', preg_replace('/\s+/', '', $match)));
 
-			if(isset($this->variables[$var])){
-				$template = str_replace($match, $this->variables[$var], $template);
+			if(isset($variables[$var])){
+				$template = str_replace($match, $variables[$var], $template);
 			}
 		}
 
@@ -282,7 +370,7 @@ Class WP_Mail
 		}
 
 		if($this->sendAsHTML){
-			add_filter('wp_mail_content_type', ['WP_Mail', 'HTMLFilter']);
+			add_filter('wp_mail_content_type', array($this, 'HTMLFilter'));
 		}
 	}		
 
