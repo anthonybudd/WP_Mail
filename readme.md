@@ -1,6 +1,6 @@
 # WP_Mail - Send Templated emails with WordPress
 
-<p align="center"><img src="https://c1.staticflickr.com/5/4156/34476075652_c809cd37f6_o.png"></p>
+<p align="center"><img src="https://ideea.co.uk/static/wp_mail.png"></p>
 
 # Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
 
