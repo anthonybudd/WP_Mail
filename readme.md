@@ -2,10 +2,9 @@
 
 <p align="center"><img src="https://c1.staticflickr.com/5/4156/34476075652_c809cd37f6_o.png"></p>
 
+# Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
+
 ## A simple class for sending templated emails using WordPress
-
-### Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
-
 
 ```php
 $email = WP_Mail::init()
@@ -98,6 +97,22 @@ The templet method is for setting the path to the html email template. The secon
 ```
 
 
+#### beforetemplate($templatePath, $variables = [])
+#### afterTemplate($templatePath, $variables = [])
+If you are sending many emails the beforeTemplate() and afterTemplate() will allow you to append and prepen templated HTML to your emails.
+```php
+    $email = (new WP_Mail)
+        ->beforeTemplate(get_template_directory() .'/email-header.html')
+		->afterTemplate(get_template_directory() .'/email-footer.html')
+        ->template(get_template_directory() .'/email.html', [
+           'name' => 'Anthony Budd',
+           'job'  => 'Developer',
+        ])
+```
+
+
+
+
 #### headers()
 This method allows you to set additional headers for your email. This can be an array of headers or a single string header.
 
@@ -117,5 +132,13 @@ This method allows you to set additional headers for your email. This can be an 
 ```
 
 
-#### send()
+#### render()
+This method is called by the send() method, the result is given directly to the $message argument of the wp_mail function. This can be used for testing or for displaying what an email will look like for admins.
+
 The render() method is called when you send an email will use a simple bit of regex to find and replace variables using a mustache-esque syntax. Finally the method sends the email using WordPresses built in wp_mail() function.
+
+```php
+    $email = (new WP_Mail)
+        ->send()
+```
+
