@@ -8,19 +8,42 @@
 
 ```php
 $email = WP_Mail::init()
-    ->to('anthonybudd94@gmail.com')
-    ->subject('test')
-    ->template(get_template_directory() .'/email.html', [
+    ->to('john.doe@gmail.com')
+    ->subject('WP_Mail is great!')
+    ->template(get_template_directory() .'/emails/demo.php', [
         'name' => 'Anthony Budd',
-        'job'  => 'Developer',
+        'location' => 'London',
+        'skills' => [
+           'PHP',
+           'AWS',
+        ] 
     ])
     ->send();
 ```
 
 email.html
 ```html
-<h1>Hello {{name}},</h1>
-<p>You work as a {{job}}.</p>
+<h3>You have a new contact from enquirey!</h3><br>
+
+<p>
+  <strong>Name:</strong><?= $name ?>
+</p>
+
+<p>
+  <strong>email:</strong>
+  <a href="mailto:<?= $email ?>"><?= $email ?></a>
+</p>
+
+<p>
+  <strong>Skills:</strong><br>
+  <ul>
+    <?php foreach($skills as $skill): ?>
+      <li>
+        <?= $skill ?>
+      </li>
+    <?php endforeach;?>
+  </ul>
+</p>
 ```
 
 ***
