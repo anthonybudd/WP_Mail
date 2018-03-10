@@ -8,7 +8,7 @@
 
 
 ```php
-$email = (new WP_Mail)
+$email = WP_Mail::init()
     ->to('anthonybudd94@gmail.com')
     ->subject('test')
     ->template(get_template_directory() .'/email.html', [
@@ -51,7 +51,7 @@ Download the WP_Mail class and require it at the top of your functions.php file.
 All of these functions allow you to set an array or string of recipient(s) for your email as shown in the example below.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->to([
             'johndoe@gmail.com'
             'mikesmith@gmail.com'
@@ -64,7 +64,7 @@ All of these functions allow you to set an array or string of recipient(s) for y
 To set the subject field use the subject function. The first argument will be the emails subject.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->subject('This this the subject')
 ```
 
@@ -72,7 +72,7 @@ To set the subject field use the subject function. The first argument will be th
 To set the from header there is a useful helper function.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->from('John Doe <john.doe@ideea.co.uk>')
 ```
 
@@ -81,7 +81,7 @@ To set the from header there is a useful helper function.
 Similar to the to, cc and bcc, methods the attach method can accept a string or array of stings. This strings must be absolute file paths, this method will throw if the file does not exist.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->attach(ABSPATH .'wp-content/uploads/2017/06/file.pdf')
 ```
 
@@ -90,7 +90,7 @@ Similar to the to, cc and bcc, methods the attach method can accept a string or 
 The templet method is for setting the path to the html email template. The second argument is for an asoc array where the keys will correspond to your HTML email’s variables. Variables are optional and are not required for templates that do not have any variables.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->template(get_template_directory() .'/email.html', [
            'name' => 'Anthony Budd',
            'job'  => 'Developer',
@@ -102,12 +102,12 @@ The templet method is for setting the path to the html email template. The secon
 This method allows you to set additional headers for your email. This can be an array of headers or a single string header.
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->headers("From: John Doe <john.doe@ideea.co.uk>")
 ```
 
 ```php
-    $email = (new WP_Mail)
+    $email = WP_Mail::init()
         ->headers([
             "From: John Doe <john.doe@ideea.co.uk>",
             "X-Mailer: PHP/". phpversion(),
@@ -119,8 +119,3 @@ This method allows you to set additional headers for your email. This can be an 
 
 #### send()
 The render() method is called when you send an email will use a simple bit of regex to find and replace variables using a mustache-esque syntax. Finally the method sends the email using WordPresses built in wp_mail() function.
-
-```php
-    $email = (new WP_Mail)
-        ->send()
-```

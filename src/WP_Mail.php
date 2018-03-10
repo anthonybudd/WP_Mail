@@ -19,15 +19,13 @@ Class WP_Mail{
 	private $subject 		 = '';
 	private $from 			 = '';
 
-	private $beforeTemplate  = FALSE;
-	private $beforeVariables = array();
+	private $headerTemplate  = FALSE;
+	private $headerVariables = array();
 	private $template 		 = FALSE;
 	private $variables 		 = array();
 	private $afterTemplate   = FALSE;
-	private $afterVariables  = array();
+	private $footerVariables  = array();
 
-
-	public function __construct(){}
 
 	public static function init(){
 		return new Self;
@@ -212,29 +210,29 @@ Class WP_Mail{
 
 	/**
 	 * Set the before-template file
-	 * @param  string $template  Path to HTML template
-	 * @param  array  $variables
+	 * @param  String $template  Path to HTML template
+	 * @param  Array  $variables
 	 * @throws Exception
 	 * @return Object $this
 	 */
-	public function beforeTemplate($template, $variables = NULL){
+	public function templateHeader($template, $variables = NULL){
 		if(!file_exists($template)){
 			throw new Exception('Template file not found');
 		}
 
 		if(is_array($variables)){ 
-			$this->beforeVariables = $variables;
+			$this->headerVariables = $variables;
 		}
 
-		$this->beforeTemplate = $template;
+		$this->headerTemplate = $template;
 		return $this;
 	}
 
 
 	/**
 	 * Set the template file
-	 * @param  string $template  Path to HTML template
-	 * @param  array  $variables
+	 * @param  String $template  Path to HTML template
+	 * @param  Array  $variables
 	 * @throws Exception
 	 * @return Object $this
 	 */
@@ -254,18 +252,18 @@ Class WP_Mail{
 
 	/**
 	 * Set the after-template file
-	 * @param  string $template  Path to HTML template
-	 * @param  array  $variables
+	 * @param  String $template  Path to HTML template
+	 * @param  Array  $variables
 	 * @throws Exception
 	 * @return Object $this
 	 */
-	public function afterTemplate($template, $variables = NULL){
+	public function templateFooter($template, $variables = NULL){
 		if(!file_exists($template)){
 			throw new Exception('Template file not found');
 		}
 
 		if(is_array($variables)){ 
-			$this->afterVariables = $variables;
+			$this->footerVariables = $variables;
 		}
 
 		$this->afterTemplate = $template;
@@ -275,7 +273,7 @@ Class WP_Mail{
 
 	/**
 	 * Renders the template
-	 * @return string
+	 * @return String
 	 */
 	public function render(){
 		return $this->renderPart('before') . 
@@ -287,19 +285,19 @@ Class WP_Mail{
 	/**
 	 * Render a specific part of the email
 	 * @author Anthony Budd
-	 * @param  string $part before, after, main
-	 * @return string 
+	 * @param  String $part before, after, main
+	 * @return String 
 	 */
 	public function renderPart($part = 'main'){
 		switch($part){
 			case 'before':
-				$templateFile = $this->beforeTemplate;
-				$variables    = $this->beforeVariables;
+				$templateFile = $this->headerTemplate;
+				$variables    = $this->headerVariables;
 				break;
 
 			case 'after':
 				$templateFile = $this->afterTemplate;
-				$variables    = $this->afterVariables;
+				$variables    = $this->footerVariables;
 				break;
 			
 			case 'main':
@@ -313,30 +311,65 @@ Class WP_Mail{
 			return '';
 		}
 
-		$template = file_get_contents($templateFile);
 
-		if(!is_array($variables) || empty($variables)){
-			return $template;
+		$extension = strtolower(pathinfo($templateFile, PATHINFO_EXTENSION));
+		if($extension === 'php'){
+
+			ob_start();
+			ob_clean();
+
+			foreach($variables as $key => $value){
+				$$key = $value;
+			}
+
+			include $templateFile;
+
+			$html = ob_get_clean();
+			
+			return $html;
+
+		}elseif($extension === 'html'){
+
+			$template = file_get_contents($templateFile);
+
+			if(!is_array($variables) || empty($variables)){
+				return $template;
+			}
+
+			return $this->parseAsMustache($template, $variables);
+
+		}else{
+			throw new Exception("Unknown extension {$extension} in path '{$templateFile}'");
 		}
+	}
 
-		preg_match_all('/\{\{\s*.+?\s*\}\}/', $template, $matches);
+	public function buildSubject(){
+		return $this->parseAsMustache(
+			$this->subject,
+			array_merge($this->headerVariables, $this->variables, $this->footerVariables));
+	}
+
+	public function parseAsMustache($string, $variables = array()){
+
+		preg_match_all('/\{\{\s*.+?\s*\}\}/', $string, $matches);
+
 		foreach($matches[0] as $match){
 			$var = str_replace('{', '', str_replace('}', '', preg_replace('/\s+/', '', $match)));
-
-			if(isset($variables[$var])){
-				$template = str_replace($match, $variables[$var], $template);
+			
+			if(isset($variables[$var]) && !is_array($variables[$var])){
+				$string = str_replace($match, $variables[$var], $string);
 			}
 		}
 
-		return $template;
+		return $string;
 	}
 
 
 	/**
 	 * Builds Email Headers
-	 * @return string email headers
+	 * @return String email headers
 	 */
-	private function buildHeaders(){
+	public function buildHeaders(){
 		$headers = '';
 
 		$headers .= implode("\r\n", $this->headers) ."\r\n";
@@ -358,9 +391,11 @@ Class WP_Mail{
 
 
 	/**
-	 * Set the wp_mail_content_type filter, if necessary 
+	 * Sends a rendered email using
+	 * WordPress's wp_mail() function
+	 * @return Bool
 	 */
-	private function beforeSend(){
+	public function send(){
 		if(count($this->to) === 0){
 			throw new Exception('You must set at least 1 recipient');
 		}
@@ -372,16 +407,7 @@ Class WP_Mail{
 		if($this->sendAsHTML){
 			add_filter('wp_mail_content_type', array($this, 'HTMLFilter'));
 		}
-	}		
-
-
-	/**
-	 * Sends a rendered email using
-	 * WordPress's wp_mail() function
-	 * @return bool
-	 */
-	public function send(){
-		$this->beforeSend();
-		return wp_mail($this->to, $this->subject, $this->render(), $this->buildHeaders(), $this->attachments);
+		
+		return wp_mail($this->to, $this->buildSubject(), $this->render(), $this->buildHeaders(), $this->attachments);
 	}
 }
