@@ -1,10 +1,10 @@
-# WP_Mail - Send Templated emails with WordPress
+# WP_Mail - Send Dynamic Templated Emails with WordPress
 
 <p align="center"><img src="https://ideea.co.uk/static/wp_mail.png"></p>
 
-# Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
+WP_Mail is the most popular, simplest and powerful dynamic email class available for WordPress. The class provides simple methods for attaching files, custom headers and lots of helper functions. The class only sends emails using the WordPress function wp_mail() , this means that all of your existing SMTP settings will continue to work with no additional config or set-up required.
 
-## A simple class for sending templated emails using WordPress
+## Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
 
 ```php
 $email = WP_Mail::init()
@@ -48,7 +48,7 @@ email.html
 
 ***
 
-### Installation
+# Installation
 
 Require WP_Mail with composer
 
@@ -66,10 +66,10 @@ Download the WP_Mail class and require it at the top of your functions.php file.
 
 ***
 
-### Methods
+# Methods
 
 
-#### to(), cc(), bcc()
+## to(), cc(), bcc()
 All of these functions allow you to set an array or string of recipient(s) for your email as shown in the example below.
 
 ```php
@@ -82,7 +82,7 @@ All of these functions allow you to set an array or string of recipient(s) for y
 ```
 
 
-#### subject()
+## subject()
 To set the subject field use the subject function. The first argument will be the emails subject.
 
 ```php
@@ -90,7 +90,7 @@ To set the subject field use the subject function. The first argument will be th
         ->subject('This this the subject')
 ```
 
-#### from()
+## from()
 To set the from header there is a useful helper function.
 
 ```php
@@ -99,7 +99,7 @@ To set the from header there is a useful helper function.
 ```
 
 
-#### attach()
+## attach()
 Similar to the to, cc and bcc, methods the attach method can accept a string or array of stings. This strings must be absolute file paths, this method will throw if the file does not exist.
 
 ```php
@@ -108,7 +108,7 @@ Similar to the to, cc and bcc, methods the attach method can accept a string or 
 ```
 
 
-#### template($templatePath, $variables = [])
+## template($templatePath, $variables = [])
 The templet method is for setting the path to the html email template. The second argument is for an asoc array where the keys will correspond to your HTML email’s variables. Variables are optional and are not required for templates that do not have any variables.
 
 ```php
@@ -120,8 +120,8 @@ The templet method is for setting the path to the html email template. The secon
 ```
 
 
-#### beforetemplate($templatePath, $variables = [])
-#### afterTemplate($templatePath, $variables = [])
+## beforetemplate($templatePath, $variables = [])
+## afterTemplate($templatePath, $variables = [])
 If you are sending many emails the beforeTemplate() and afterTemplate() will allow you to append and prepen templated HTML to your emails.
 ```php
     $email = (new WP_Mail)
@@ -136,7 +136,7 @@ If you are sending many emails the beforeTemplate() and afterTemplate() will all
 
 
 
-#### headers()
+## headers()
 This method allows you to set additional headers for your email. This can be an array of headers or a single string header.
 
 ```php
@@ -155,7 +155,7 @@ This method allows you to set additional headers for your email. This can be an 
 ```
 
 
-#### render()
+## render()
 This method is called by the send() method, the result is given directly to the $message argument of the wp_mail function. This can be used for testing or for displaying what an email will look like for admins.
 
 The render() method is called when you send an email will use a simple bit of regex to find and replace variables using a mustache-esque syntax. Finally the method sends the email using WordPresses built in wp_mail() function.
