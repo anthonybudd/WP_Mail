@@ -120,8 +120,11 @@ The templet method is for setting the path to the html email template. The secon
 ```
 
 
-## beforetemplate($templatePath, $variables = [])
-## afterTemplate($templatePath, $variables = [])
+### templateHeader($templatePath, $variables = [])
+### templateFooter($templatePath, $variables = [])
+Self-explanatory  
+
+
 If you are sending many emails the beforeTemplate() and afterTemplate() will allow you to append and prepen templated HTML to your emails.
 ```php
     $email = (new WP_Mail)
