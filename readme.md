@@ -2,8 +2,6 @@
 
 WP_Mail is the most popular, simplest and powerful dynamic email class available for WordPress. The class provides simple methods for attaching files, custom headers and lots of helper functions. The class only sends emails using the WordPress function wp_mail() , this means that all of your existing SMTP settings will continue to work with no additional config or set-up required.
 
-## Introduction: [Medium Post](https://medium.com/@AnthonyBudd/wp-mail-send-templated-emails-with-wordpress-314a71f83db2)
-
 ```php
 $email = WP_Mail::init()
     ->to('john.doe@gmail.com')
