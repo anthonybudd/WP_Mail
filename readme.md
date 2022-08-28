@@ -6,7 +6,7 @@ WP_Mail is the most popular, simplest and powerful dynamic email class available
 $email = WP_Mail::init()
     ->to('john.doe@gmail.com')
     ->subject('WP_Mail is great!')
-    ->template(get_template_directory() .'/emails/demo.php', [
+    ->template(get_theme_file_path() .'/emails/demo.php', [
         'name' => 'Anthony Budd',
         'location' => 'London',
         'skills' => [
@@ -109,7 +109,7 @@ The templet method is for setting the path to the html email template. The secon
 
 ```php
     $email = WP_Mail::init()
-        ->template(get_template_directory() .'/email.html', [
+        ->template(get_theme_file_path() .'/email.html', [
            'name' => 'Anthony Budd',
            'job'  => 'Developer',
         ])
@@ -124,9 +124,9 @@ Self-explanatory
 If you are sending many emails the beforeTemplate() and afterTemplate() will allow you to append and prepen templated HTML to your emails.
 ```php
     $email = (new WP_Mail)
-        ->beforeTemplate(get_template_directory() .'/email-header.html')
-		->afterTemplate(get_template_directory() .'/email-footer.html')
-        ->template(get_template_directory() .'/email.html', [
+        ->beforeTemplate(get_theme_file_path() .'/email-header.html')
+		->afterTemplate(get_theme_file_path() .'/email-footer.html')
+        ->template(get_theme_file_path() .'/email.html', [
            'name' => 'Anthony Budd',
            'job'  => 'Developer',
         ])
